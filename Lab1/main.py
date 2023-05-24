@@ -22,3 +22,7 @@ def get_even_numbers(numbers):
 
 if __name__ == '__main__':
     print('Hello World!')
+    print(calculate(25, 5, 'add'))
+    print(calculate(1, 9, 'sub'))
+    print(calculate(6, 3.3, 'mul'))
+    print(calculate(15, 3, 'div'))
