@@ -26,3 +26,6 @@ if __name__ == '__main__':
     print(calculate(1, 9, 'sub'))
     print(calculate(6, 3.3, 'mul'))
     print(calculate(15, 3, 'div'))
+    numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    print(get_even_numbers(numbers))
+    
