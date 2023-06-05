@@ -66,3 +66,18 @@ WORD_OMISS_RE_LIST = [
     r'{bwr}Dec\.{awlr}',
     r'{bwr}\.\s\.\s\.{awlr}'
 ]
+
+
+def list_to_re(re_list):
+    return '(' + '|'.join(re_list).format(**FORMAT_PARAMETERS_RE) + ')'
+
+
+def find_matches(regex, text, capture_group):
+    match_list = list()
+
+    for m in re.finditer(regex, text):
+
+        if m[capture_group] != None:
+            match_list.append(m[capture_group])
+
+    return match_list
