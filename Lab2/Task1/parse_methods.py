@@ -81,3 +81,8 @@ def find_matches(regex, text, capture_group):
             match_list.append(m[capture_group])
 
     return match_list
+
+
+def sentences(text):
+    sentence_re = r'{br}({0}|[^\.\!\?])+[\.\!\?][\.\!\?\"\)]*'.format(list_to_re(WORD_OMISS_RE_LIST), **FORMAT_PARAMETERS_RE)
+    return find_matches(sentence_re, text, 0)
