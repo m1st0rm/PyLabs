@@ -99,3 +99,14 @@ def sentence_count(text):
 
 def non_declarative_sentence_count(text):
     return len(non_declarative_sentences(text))
+
+
+def raw_words(text):
+    raw_word_re = r'{bwr}[^\.\,\:\!\?\"\)\(\s]+({awer}|{awlr}|{awur})'.format(**FORMAT_PARAMETERS_RE)
+    return find_matches(raw_word_re, text, 0)
+
+
+def words(text):
+    word_group = 'wg'
+    word_re = r'({0}|{1})|(?P<{2}>{bwr}[a-zA-Z][a-zA-Z0-9\']*({awer}|{awlr}|{awur}))'.format(list_to_re(WORD_ENDS_RE_LIST), list_to_re(WORD_OMISS_RE_LIST), word_group, **FORMAT_PARAMETERS_RE)
+    return find_matches(word_re, text, word_group)
