@@ -110,3 +110,19 @@ def words(text):
     word_group = 'wg'
     word_re = r'({0}|{1})|(?P<{2}>{bwr}[a-zA-Z][a-zA-Z0-9\']*({awer}|{awlr}|{awur}))'.format(list_to_re(WORD_ENDS_RE_LIST), list_to_re(WORD_OMISS_RE_LIST), word_group, **FORMAT_PARAMETERS_RE)
     return find_matches(word_re, text, word_group)
+
+
+def avg_sentence_length(text):
+    characters_count = 0
+    sentence_list = sentences(text)
+
+    for sentence in sentence_list:
+        word_list = words(sentence)
+
+        for word in word_list:
+            characters_count += len(word)
+
+    try:
+        return characters_count/len(sentence_list)
+    except:
+        return 0
