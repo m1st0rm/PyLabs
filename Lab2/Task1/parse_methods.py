@@ -91,3 +91,11 @@ def sentences(text):
 def non_declarative_sentences(text):
     non_declarative_sentence_re = r'{br}({0}|[^\.\!\?])+[\!\?][\.\!\?\"\)]*'.format(list_to_re(WORD_OMISS_RE_LIST), **FORMAT_PARAMETERS_RE)
     return find_matches(non_declarative_sentence_re, text, 0)
+
+
+def sentence_count(text):
+    return len(sentences(text))
+
+
+def non_declarative_sentence_count(text):
+    return len(non_declarative_sentences(text))
