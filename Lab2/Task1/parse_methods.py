@@ -7,8 +7,8 @@ BEFORE_WORD_RE = r'(?<![^\s\"\(])'
 AFTER_END_RE = r'(?=\s*$)'
 AFTER_ANY_RE = r'(?=\s+[^\s])'
 AFTER_WORD_END_RE = r'(?=[\.\,\:\!\?\"\)\s]*$)'
-AFTER_WORD_UPPER_RE = r'(?=[\.\,\:\!\?\"\)]*\s+[A-B])'
-AFTER_WORD_LOWER_RE = r'(?=[\.\,\:\!\?\"\)]*\s+[^\sA-B])'
+AFTER_WORD_UPPER_RE = r'(?=[\.\,\:\!\?\"\)]*\s+[A-Z])'
+AFTER_WORD_LOWER_RE = r'(?=[\.\,\:\!\?\"\)]*\s+[^\sA-Z])'
 
 FORMAT_PARAMETERS_RE = dict(
     br=BEFORE_RE,
