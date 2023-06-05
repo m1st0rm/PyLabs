@@ -29,3 +29,4 @@ def yes_no_input(request):
         return True
     else:
         return False
+    
