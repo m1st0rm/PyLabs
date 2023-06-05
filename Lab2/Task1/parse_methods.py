@@ -126,3 +126,18 @@ def avg_sentence_length(text):
         return characters_count/len(sentence_list)
     except:
         return 0
+
+def avg_word_length(text):
+    characters_count = 0
+    word_list = words(text)
+
+    for word in word_list:
+        characters_count += len(word)
+
+    try:
+        return characters_count/len(word_list)
+    except:
+        return 0
+
+
+
