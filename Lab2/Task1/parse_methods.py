@@ -140,4 +140,16 @@ def avg_word_length(text):
         return 0
 
 
+def top_n_grams(text: str, n):
+    raw_word_list = raw_words(text.lower())
+    n_gram_list = list()
 
+    for i in range(len(raw_word_list)+1-n):
+        n_gram_list.append(raw_word_list[i:i+n])
+
+    n_gram_dict = dict()
+
+    for n_gram in n_gram_list:
+        n_gram_dict[' '.join(n_gram)] = n_gram_list.count(n_gram)
+
+    return sorted(n_gram_dict.items(), key=lambda x:x[1], reverse=True)
