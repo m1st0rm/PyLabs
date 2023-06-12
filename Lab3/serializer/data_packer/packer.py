@@ -146,5 +146,95 @@ class Packer:
             '__packer_storage__': stored
         }
 
+    def unpack(self, obj):
+        if isinstance(obj, PRIMITIVE_TYPES):
+            return obj
+        elif isinstance(obj, list):
+            return [self.unpack(item) for item in obj]
+        elif isinstance(obj, dict):
+            if '__type__' in obj.keys():
+                match obj['__type__']:
+                    case 'bytes':
+                        return self._unpack_bytes(obj)
+                    case 'iterator':
+                        return self._unpack_iterator(obj)
+                    case 'function':
+                        return self._unpack_function(obj)
+                    case 'code':
+                        return self._unpack_code(obj)
+                    case 'cell':
+                        return self._unpack_cell(obj)
+                    case 'module':
+                        return self._unpack_module(obj)
+                    case 'class':
+                        return self._unpack_class(obj)
+                    case 'object':
+                        return self._unpack_object(obj)
+                    case 'tuple':
+                        return tuple(self.unpack(item) for item in obj['__packer_storage__'])
+                    case 'set':
+                        return set(self.unpack(item) for item in obj['__packer_storage__'])
+            else:
+                return {key: self.unpack(value) for key, value in obj.items()}
+        else:
+            return obj
 
-    
+    def _unpack_bytes(self, obj):
+        return bytes.fromhex(obj['__packer_storage__'])
+
+    def _unpack_iterator(self, obj):
+        return iter(self.unpack(item) for item in obj['__packer_storage__'])
+
+    def _unpack_function(self, obj):
+        unpacked = self.unpack(obj['__packer_storage__'])
+        dictionary = unpacked.pop('dictionary')
+        skeleton_func = types.FunctionType(**unpacked)
+
+        if obj['__method__'] and self.processed_class_obj != None:
+            skeleton_func = types.MethodType(skeleton_func, self.processed_class_obj)
+
+        skeleton_func.__dict__.update(dictionary)
+        skeleton_func.__globals__.update({skeleton_func.__name__: skeleton_func})
+        return skeleton_func
+
+    def _unpack_code(self, obj):
+        temp = lambda x: x
+        return temp.__code__.replace(**(self.unpack(obj['__packer_storage__'])))
+
+    def _unpack_cell(self, obj):
+        return self.__make_cell_skeleton(self.unpack(obj['__packer_storage__']))
+
+    def _unpack_module(self, obj):
+        return __import__(obj['__packer_storage__'])
+
+    def _unpack_class(self, obj):
+        stored = obj['__packer_storage__']
+        bases = tuple(self.unpack(base) for base in stored.pop('__bases__'))
+
+        innards = {}
+        for key, value in stored.items():
+            if not self.__is_func(value) and not isinstance(value, dict):
+                innards[key] = self.unpack(value)
+
+        new_class = type(stored['__name__'], bases, innards)
+
+        for key, value in stored.items():
+            if isinstance(value, dict) and '__type__' in value.keys() and value['__type__'] == 'function':
+                func = self.unpack(value)
+                func.__globals__.update({new_class.__name__: new_class})
+
+                if value['__method__']:
+                    func = types.MethodType(func, new_class)
+
+                setattr(new_class, key, func)
+
+        return new_class
+
+    def _unpack_object(self, obj):
+        stored = obj['__packer_storage__']
+        related_class = self.unpack(stored['__class__'])
+        new_obj = object.__new__(related_class)
+        self.processed_class_obj = new_obj
+        new_obj.__dict__ = {key: self.unpack(value) for key, value in stored['attrs'].items()}
+        self.processed_class_obj = None
+        return new_obj
