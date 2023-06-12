@@ -118,3 +118,33 @@ class Packer:
             '__type__': 'module',
             '__packer_storage__': obj.__name__
         }
+
+    def _pack_class(self, obj):
+        stored = {'__name__': obj.__name__}
+        stored['__bases__'] = [self.pack(base) for base in obj.__bases__ if base != object]
+
+        for key, value in inspect.getmembers(obj):
+            if key not in IGNORE_DUNDER and type(value) not in IGNORE_TYPES:
+                stored[key] = self.pack(value)
+
+        return {
+            '__type__': 'class',
+            '__packer_storage__': stored
+        }
+
+    def _pack_object(self, obj):
+        stored = {
+            '__class__': self.pack(obj.__class__),
+            'attrs': {}
+        }
+
+        for attr, value in inspect.getmembers(obj):
+            if not attr.startswith('__') and not self.__is_func(value):
+                stored['attrs'][attr] = self.pack(value)
+        return {
+            '__type__': 'object',
+            '__packer_storage__': stored
+        }
+
+
+    
