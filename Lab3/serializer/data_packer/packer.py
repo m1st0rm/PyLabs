@@ -66,5 +66,38 @@ class Packer:
                 '__packer_storage__': [self.pack(item) for item in obj]
             }
 
+    def _pack_iterator(self, obj):
+        return {
+            '__type__': 'iterator',
+            '__packer_storage__': [self.pack(item) for item in obj]
+        }
 
-        
+    def _pack_function(self, obj):
+        cls = self.__extract_class(obj)
+
+        globs = {}
+        for key, value in obj.__globals__.items():
+            if key in obj.__code__.co_names and key != obj.__code__.co_name and value is not cls:
+                globs[key] = self.pack(value)
+
+        closure = tuple()
+        if obj.__closure__ is not None:
+            closure = tuple(cell for cell in obj.__closure__ if cell.cell_contents is not cls)
+
+        return {
+            '__type__': 'function',
+            '__packer_storage__': self.pack(
+                dict(
+                    code=obj.__code__,
+                    globals=globs,
+                    name=obj.__name__,
+                    argdefs=obj.__defaults__,
+                    closure=closure,
+                    dictionary=obj.__dict__
+                )
+            ),
+            '__method__': inspect.ismethod(obj)
+        }
+
+
+    
