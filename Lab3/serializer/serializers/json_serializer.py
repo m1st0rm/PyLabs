@@ -135,5 +135,14 @@ class Json(MetaSerializer):
 
         return data_slice, end_index + 3
 
+    def __string_catcher(self, string, index):
+        end_index = index
+
+        while string[end_index] != '"' and end_index < len(string):
+            end_index += 1
+        data_slice = string[index:end_index]
+
+        return data_slice, end_index + 3
+
 
     
