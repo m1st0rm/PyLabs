@@ -11,3 +11,18 @@ class Packer:
 
     def __is_func(self, obj):
         return isinstance(obj, types.MethodType) or isinstance(obj, types.FunctionType)
+
+    def __extract_class(self, obj):
+        cls = getattr(inspect.getmodule(obj), obj.__qualname__.split(".<locals>", 1)[0].rsplit(".", 1)[0], None)
+        if isinstance(cls, type):
+            return cls
+
+    def __make_cell_skeleton(self, value):
+        x = value
+
+        def closure():
+            return x
+
+        return closure.__closure__[0]
+
+
