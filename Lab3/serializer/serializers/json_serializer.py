@@ -77,5 +77,32 @@ class Json(MetaSerializer):
             case '{':
                 return self.__deser_dict(string, index)
 
+    def __deser_dict(self, string, index):
+        # on start string fragment {......}
+        end_index = index
+        bracket_count = 1
+
+        # related element
+        while bracket_count > 0 and end_index + 1 < len(string):
+            end_index += 1
+            if string[end_index] == '{':
+                bracket_count += 1
+            if string[end_index] == '}':
+                bracket_count -= 1
+        index += 1
+        # from here string fragment ......}
+        result = {}
+        while index < end_index:
+            if string[index] in (',', ' '):
+                index += 1
+                continue
+            key, index = self.__loads_with_index(string, index)
+            while string[index] in (':', ' '):
+                index += 1
+            value, index = self.__loads_with_index(string, index)
+            result[key] = value
+
+        return result, end_index + 1
+
 
     
