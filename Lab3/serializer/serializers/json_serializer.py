@@ -144,5 +144,29 @@ class Json(MetaSerializer):
 
         return data_slice, end_index + 3
 
+    def __deser_number(self, string, index):
+        end_index = index
 
-    
+        while string[end_index] != '"' and end_index < len(string):
+            end_index += 1
+        data_slice = string[index:end_index]
+
+        try:
+            if '.' in data_slice:
+                return float(data_slice), end_index + 1
+            else:
+                return int(data_slice), end_index + 1
+        except:
+            return self.__string_catcher(string, index)
+
+    def __deser_primitive(self, string, index):
+        index += 1
+        if string[index] == 'N':
+            return None, index + 5
+        elif string[index] == 'T':
+            return True, index + 5
+        elif string[index] == 'F':
+            return False, index + 6
+        else:
+            return self.__deser_number(string, index)
+        
