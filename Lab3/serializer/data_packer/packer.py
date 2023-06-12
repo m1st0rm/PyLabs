@@ -25,4 +25,29 @@ class Packer:
 
         return closure.__closure__[0]
 
+    def pack(self, obj):
+        if isinstance(obj, PRIMITIVE_TYPES):
+            return obj
+        elif isinstance(obj, bytes):
+            return self._pack_bytes(obj)
+        elif isinstance(obj, (list, tuple, set, dict)):
+            return self._pack_collection(obj)
+        elif self.__is_iter(obj):
+            return self._pack_iterator(obj)
+        elif self.__is_func(obj):
+            return self._pack_function(obj)
+        elif isinstance(obj, types.CodeType):
+            return self._pack_code(obj)
+        elif isinstance(obj, types.CellType):
+            return self._pack_cell(obj)
+        elif isinstance(obj, types.ModuleType):
+            return self._pack_module(obj)
+        elif inspect.isclass(obj):
+            return self._pack_class(obj)
+        elif isinstance(obj, object):
+            return self._pack_object(obj)
+        else:
+            raise Exception('unprocessed type')
 
+
+        
