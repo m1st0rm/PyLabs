@@ -57,5 +57,25 @@ class Json(MetaSerializer):
 
         return result[:-1] + ']'
 
+    def load(self, file):
+        data = file.read()
+        return self.loads(data)
+
+    def loads(self, string):
+        result, ind = self.__loads_with_index(string, 0)
+        return self.data_packer.unpack(result)
+
+    def __loads_with_index(self, string, index):
+        match string[index]:
+            case '"':
+                if string[index + 1] == "'":
+                    return self.__deser_string(string, index + 2)
+                else:
+                    return self.__deser_primitive(string, index)
+            case '[':
+                return self.__deser_list(string, index)
+            case '{':
+                return self.__deser_dict(string, index)
+
 
     
