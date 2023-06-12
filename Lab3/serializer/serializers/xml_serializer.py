@@ -29,3 +29,37 @@ class Xml(MetaSerializer):
 
     def __ser_primitive(self, packed):
         return f'<{packed.__class__.__name__}>{packed}</{packed.__class__.__name__}>'
+
+    def load(self, file):
+        data = file.read()
+        return self.loads(data)
+
+    def loads(self, string):
+        result, ind = self.__loads_with_index(string, 0)
+        return self.data_packer.unpack(result)
+
+    def __loads_with_index(self, string, index):
+
+        index += 1
+        end_index = index
+        while string[end_index] != '>':
+            end_index += 1
+
+        tag = string[index:end_index]
+
+        match tag:
+            case 'int' | 'float':
+                return self.__deser_digit(string, end_index + 1)
+            case 'bool':
+                return self.__deser_bool(string, end_index + 1)
+            case 'NoneType':
+                return None, index + 24
+            case 'str':
+                return self.__deser_str(string, end_index + 1)
+            case 'list':
+                return self.__deser_list(string, end_index + 1)
+            case 'dict':
+                return self.__deser_dict(string, end_index + 1)
+
+
+            
