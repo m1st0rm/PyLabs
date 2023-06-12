@@ -61,5 +61,73 @@ class Xml(MetaSerializer):
             case 'dict':
                 return self.__deser_dict(string, end_index + 1)
 
+    def __deser_digit(self, string, index):
+        end_index = index
 
-            
+        while string[end_index] != '<':
+            end_index += 1
+
+        data_slice = string[index:end_index]
+        if '.' in data_slice:
+            return float(data_slice), end_index + 8
+        return int(data_slice), end_index + 6
+
+    def __deser_bool(self, string, index):
+        if string[index] == 'T':
+            return True, index + 11
+        else:
+            return False, index + 12
+
+    def __deser_str(self, string, index):
+        end_index = index
+        while string[end_index:end_index + 6] != '</str>':
+            end_index += 1
+
+        data_slice = string[index + 1:end_index - 1]
+        return f'{data_slice}', end_index + 6
+
+    def __deser_list(self, string, index):
+        end_index = index
+
+        result = []
+
+        bracket_count = 1
+        while bracket_count > 0:
+            if string[end_index:end_index + 6] == '<list>':
+                bracket_count += 1
+            elif string[end_index:end_index + 7] == '</list>':
+                bracket_count -= 1
+            end_index += 1
+        end_index -= 1
+
+        while index < end_index:
+            item, index = self.__loads_with_index(string, index)
+            result.append(item)
+
+        return result, end_index + 7
+
+    def __deser_dict(self, string, index):
+        end_index = index
+
+        result = {}
+        bracket_count = 1
+        while bracket_count > 0:
+            if string[end_index:end_index + 6] == '<dict>':
+                bracket_count += 1
+            elif string[end_index:end_index + 7] == '</dict>':
+                bracket_count -= 1
+            end_index += 1
+        end_index -= 1
+
+        while index < end_index:
+            item, index = self.__deser_dict_item(string, index)
+            result[item[0]] = item[1]
+
+        return result, end_index + 7
+
+    def __deser_dict_item(self, string, index):
+        end_index = index + 11
+        key, end_index = self.__loads_with_index(string, end_index)
+        end_index += 13
+        value, end_index = self.__loads_with_index(string, end_index)
+        return (key, value), end_index + 15
