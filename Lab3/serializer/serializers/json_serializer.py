@@ -19,5 +19,27 @@ class Json(MetaSerializer):
 
         return self.__ser_primitive(obj)
 
+    def __ser_primitive(self, obj):
+        if isinstance(obj, str):
+            obj = f"'{obj}'"
+        return f'"{str(obj)}"'
+
+    def __dict_to_string_util(self, dictionary):
+        if not dictionary:
+            return '{}'
+
+        result = '{'
+
+        for key, value in dictionary.items():
+            if isinstance(value, dict):
+                result += f'"{key}": {self.__dict_to_string_util(value)},'
+            elif isinstance(value, (list, tuple)):
+                result += f'"{key}": {self.__list_n_tuple_to_string_util(value)},'
+            else:
+
+                result += f'"{key}": {self.__ser_primitive(value)},'
+
+        return result[:-1] + '}'
+
 
     
