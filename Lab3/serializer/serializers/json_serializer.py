@@ -126,5 +126,14 @@ class Json(MetaSerializer):
 
         return result, end_index + 1
 
+    def __deser_string(self, string, index):
+        end_index = index
+
+        while string[end_index] != "'" and end_index < len(string):
+            end_index += 1
+        data_slice = string[index:end_index]
+
+        return data_slice, end_index + 3
+
 
     
