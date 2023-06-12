@@ -49,5 +49,22 @@ class Packer:
         else:
             raise Exception('unprocessed type')
 
+    def _pack_bytes(self, obj):
+        return {
+            '__type__': 'bytes',
+            '__packer_storage__': obj.hex()
+        }
+
+    def _pack_collection(self, obj):
+        if isinstance(obj, dict):
+            return {key: self.pack(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self.pack(item) for item in obj]
+        else:
+            return {
+                '__type__': type(obj).__name__,
+                '__packer_storage__': [self.pack(item) for item in obj]
+            }
+
 
         
