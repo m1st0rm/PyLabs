@@ -90,7 +90,6 @@ class Json(MetaSerializer):
             if string[end_index] == '}':
                 bracket_count -= 1
         index += 1
-        # from here string fragment ......}
         result = {}
         while index < end_index:
             if string[index] in (',', ' '):
@@ -101,6 +100,29 @@ class Json(MetaSerializer):
                 index += 1
             value, index = self.__loads_with_index(string, index)
             result[key] = value
+
+        return result, end_index + 1
+
+    def __deser_list(self, string, index):
+        end_index = index + 1
+        bracket_count = 1
+
+        while bracket_count > 0 and end_index < len(string):
+            if string[end_index] == '[':
+                bracket_count += 1
+            if string[end_index] == ']':
+                bracket_count -= 1
+            end_index += 1
+        index += 1
+        result = []
+        while index < end_index:
+            if string[index] in (',', ' '):
+                index += 1
+                continue
+            if end_index - index < 2:
+                break
+            element, index = self.__loads_with_index(string, index)
+            result.append(element)
 
         return result, end_index + 1
 
