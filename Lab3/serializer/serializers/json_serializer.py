@@ -41,5 +41,21 @@ class Json(MetaSerializer):
 
         return result[:-1] + '}'
 
+    def __list_n_tuple_to_string_util(self, collection):
+        if not collection:
+            return '[]'
+
+        result = '['
+
+        for item in collection:
+            if isinstance(item, dict):
+                result += f'{self.__dict_to_string_util(item)},'
+            elif isinstance(item, (list, tuple)):
+                result += f'{self.__list_n_tuple_to_string_util(item)},'
+            else:
+                result += f'{self.__ser_primitive(item)},'
+
+        return result[:-1] + ']'
+
 
     
