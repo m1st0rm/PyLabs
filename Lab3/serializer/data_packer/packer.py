@@ -99,5 +99,22 @@ class Packer:
             '__method__': inspect.ismethod(obj)
         }
 
+    def _pack_code(self, obj):
+        primary_code = [code for code in dir(obj) if code.startswith('co_')]
+        return {
+            '__type__': 'code',
+            '__packer_storage__': {code: self.pack(getattr(obj, code)) for code in primary_code if
+                                   code not in IGNORE_CODE}
+        }
 
-    
+    def _pack_cell(self, obj):
+        return {
+            '__type__': 'cell',
+            '__packer_storage__': self.pack(obj.cell_contents)
+        }
+
+    def _pack_module(self, obj):
+        return {
+            '__type__': 'module',
+            '__packer_storage__': obj.__name__
+        }
